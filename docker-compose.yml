@@ -1,0 +1,8 @@
+services:
+  app:
+    build:
+      context: .
+      target: prod
+    ports:
+      - "10000:10000"
+    restart: unless-stopped

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Docker Viewer</title>
+    <link rel="stylesheet" href="/public/css/app.css">
+</head>
+<body class="login-pagina">
+
+    <div class="login-caja">
+
+        <div class="login-logo">
+            <svg class="login-icono" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/>
+            </svg>
+            <h1 class="login-titulo">Docker Viewer</h1>
+        </div>
+
+        <form action="/login" method="POST" class="login-form">
+            <div class="login-campo">
+                <label class="login-label">Usuario</label>
+                <input type="text" name="identificador" class="login-input" placeholder="Usuario o correo" autocomplete="username">
+            </div>
+            <div class="login-campo">
+                <label class="login-label">Contraseña</label>
+                <input type="password" name="password" class="login-input" placeholder="••••••" autocomplete="current-password">
+            </div>
+            <button type="submit" class="login-boton">Entrar</button>
+        </form>
+
+    </div>
+
+</body>
+</html>

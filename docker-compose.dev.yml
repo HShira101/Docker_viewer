@@ -1,0 +1,14 @@
+services:
+  app:
+    build:
+      context: .
+      target: dev
+    ports:
+      - "10000:10000"
+    volumes:
+      - ./Front:/app/Front
+      - go_mod_cache:/root/go/pkg/mod
+    restart: unless-stopped
+
+volumes:
+  go_mod_cache:

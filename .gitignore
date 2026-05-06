@@ -1,0 +1,12 @@
+CLAUDE.md
+.claude/
+
+# Go
+Front/tmp/
+Back/tmp/
+
+# SQLite
+SQLite/*.sqlite
+
+# Env
+.env
