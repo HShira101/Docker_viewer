@@ -25,6 +25,23 @@
 
 .boton-actualizar:hover { opacity: 0.85; }
 
+/* --------- Barra de estado de acciones --------- */
+.contenedores-estado {
+    display: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    /* Propiedades - Flex */
+    align-items: center;
+    gap: 8px;
+}
+
+.contenedores-estado--progreso { display: flex; background: #f1f5f9; color: var(--text); }
+.contenedores-estado--ok       { display: flex; background: #dcfce7; color: #16a34a; }
+.contenedores-estado--error    { display: flex; background: #fee2e2; color: #dc2626; }
+
 /* --------- Grid de contenedores --------- */
 .contenedores-grid {
     display: grid;

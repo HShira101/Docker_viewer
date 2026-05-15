@@ -29,9 +29,17 @@
     <!-- ---- Acciones: botón dinámico según estado + acceso a logs ---- -->
     <div class="tarjeta-acciones">
         {{if eq .Estado "running"}}
-        <button class="tarjeta-boton tarjeta-boton--detener">Detener</button>
+        <button class="tarjeta-boton tarjeta-boton--detener"
+            data-id="{{.ID}}"
+            data-nombre="{{.Nombre}}"
+            data-accion="detener"
+            onclick="accionContenedor(this)">Detener</button>
         {{else}}
-        <button class="tarjeta-boton tarjeta-boton--iniciar">Iniciar</button>
+        <button class="tarjeta-boton tarjeta-boton--iniciar"
+            data-id="{{.ID}}"
+            data-nombre="{{.Nombre}}"
+            data-accion="iniciar"
+            onclick="accionContenedor(this)">Iniciar</button>
         {{end}}
         <button class="tarjeta-boton tarjeta-boton--logs">Logs</button>
     </div>

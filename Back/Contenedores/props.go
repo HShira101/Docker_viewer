@@ -10,3 +10,9 @@ type Contenedor struct {
 	Estado         string    `json:"estado"`
 	UltimaConsulta time.Time `json:"ultima_consulta"` // ← fecha/hora de la última sincronización con Docker
 }
+
+// ---- Respuesta estándar para acciones sobre contenedores ----
+type Respuesta struct {
+	OK      bool   `json:"ok"`
+	Mensaje string `json:"mensaje"`
+}

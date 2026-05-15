@@ -14,19 +14,34 @@ import (
 // ---- Hace una petición GET a la API de Docker vía Unix socket ----
 func dockerGet(ruta string, destino any) error {
 	// --- Recibe ruta como string con el endpoint Docker y destino como puntero a struct ---
-	cliente := &http.Client{
-		Transport: &http.Transport{
-			DialContext: func(ctx context.Context, _, _ string) (net.Conn, error) {
-				return (&net.Dialer{}).DialContext(ctx, "unix", "/var/run/docker.sock") // ← conecta al socket Unix de Docker
-			},
-		},
-	}
-	resp, err := cliente.Get("http://localhost" + ruta)
+	resp, err := clienteDocker().Get("http://localhost" + ruta)
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
 	return json.NewDecoder(resp.Body).Decode(destino)
+}
+
+// ---- Hace una petición POST a la API de Docker vía Unix socket y devuelve el código HTTP ----
+func dockerPost(ruta string) (int, error) {
+	// --- Recibe ruta como string con el endpoint Docker ---
+	resp, err := clienteDocker().Post("http://localhost"+ruta, "application/json", nil)
+	if err != nil {
+		return 0, err
+	}
+	defer resp.Body.Close()
+	return resp.StatusCode, nil
+}
+
+// ---- Construye el cliente HTTP configurado para conectar al socket Unix de Docker ----
+func clienteDocker() *http.Client {
+	return &http.Client{
+		Transport: &http.Transport{
+			DialContext: func(ctx context.Context, _, _ string) (net.Conn, error) {
+				return (&net.Dialer{}).DialContext(ctx, "unix", "/var/run/docker.sock") // ← socket Unix de Docker
+			},
+		},
+	}
 }
 
 // ---- Consulta Docker y actualiza o inserta los contenedores en SQLite ----

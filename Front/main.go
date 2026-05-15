@@ -40,7 +40,9 @@ func main() {
 	rute.HandleFunc("POST /login",           controlador.EntrarLogin)
 	rute.HandleFunc("POST /logout",          controlador.CerrarSesion)
 	rute.HandleFunc("GET /contenedores",     controlador.MostrarContenedores)
-	rute.HandleFunc("GET /api/contenedores", controlador.APIContenedores) // ← endpoint para el fetch del botón actualizar
+	rute.HandleFunc("GET /api/contenedores",               controlador.APIContenedores) // ← endpoint para el fetch del botón actualizar
+	rute.HandleFunc("POST /api/contenedores/{id}/iniciar", controlador.APIIniciar)
+	rute.HandleFunc("POST /api/contenedores/{id}/detener", controlador.APIDetener)
 	rute.HandleFunc("GET /logs",             controlador.MostrarLogs)
 	rute.HandleFunc("GET /",                 controlador.MostrarInicio)
 

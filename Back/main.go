@@ -28,7 +28,9 @@ func main() {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("ok")) // ← usado por el healthcheck del docker-compose
 	})
-	mux.HandleFunc("GET /api/contenedores", contenedores.Listar)
+	mux.HandleFunc("GET /api/contenedores",            contenedores.Listar)
+	mux.HandleFunc("POST /api/contenedores/{id}/iniciar", contenedores.Iniciar)
+	mux.HandleFunc("POST /api/contenedores/{id}/detener", contenedores.Detener)
 
 	log.Println("Backend en :10001 → http://localhost:10001")
 	log.Fatal(http.ListenAndServe(":10001", mux))
