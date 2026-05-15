@@ -1,11 +1,87 @@
 {{define "content"}}
-<h2 class="vista-titulo">Contenedores</h2>
 
-<div class="contenedores-grid">
+<div class="contenedores-barra">
+    <div>
+        <h2 class="vista-titulo">Contenedores</h2>
+        <span class="ultima-actualizacion">Última actualización: <span id="timer">ahora</span></span>
+    </div>
+    <button class="boton-actualizar" id="btn-actualizar" onclick="actualizar()">Actualizar</button>
+</div>
+
+<div class="contenedores-grid" id="contenedores-grid">
     {{range .Contenedores}}
         {{template "tarjeta" .}}
     {{else}}
-        <p class="vista-subtitulo">No se pudo conectar con Docker o no hay contenedores.</p>
+        <p class="vista-subtitulo">No se pudo conectar con el backend o no hay contenedores.</p>
     {{end}}
 </div>
+
+<script>
+    let seg = 0;
+    const timerEl = document.getElementById('timer');
+
+    setInterval(() => {
+        seg++;
+        if (seg < 60) {
+            timerEl.textContent = 'hace ' + seg + 's';
+        } else {
+            const m = Math.floor(seg / 60), s = seg % 60;
+            timerEl.textContent = 'hace ' + m + 'm ' + s + 's';
+        }
+    }, 1000);
+
+    function renderTarjeta(c) {
+        const activo = c.estado === 'running';
+        return `
+            <div class="tarjeta">
+                <div class="tarjeta-cabecera">
+                    <span class="tarjeta-indicador ${activo ? 'tarjeta-indicador--activo' : 'tarjeta-indicador--inactivo'}"></span>
+                    <span class="tarjeta-nombre">${c.nombre}</span>
+                    <span class="tarjeta-estado ${activo ? 'tarjeta-estado--activo' : 'tarjeta-estado--inactivo'}">
+                        ${activo ? 'Activo' : 'Detenido'}
+                    </span>
+                </div>
+                <div class="tarjeta-cuerpo">
+                    <div class="tarjeta-fila">
+                        <span class="tarjeta-label">Imagen</span>
+                        <span class="tarjeta-valor">${c.imagen}</span>
+                    </div>
+                    <div class="tarjeta-fila">
+                        <span class="tarjeta-label">ID</span>
+                        <span class="tarjeta-valor tarjeta-id">${c.id}</span>
+                    </div>
+                </div>
+                <div class="tarjeta-acciones">
+                    ${activo
+                        ? '<button class="tarjeta-boton tarjeta-boton--detener">Detener</button>'
+                        : '<button class="tarjeta-boton tarjeta-boton--iniciar">Iniciar</button>'
+                    }
+                    <button class="tarjeta-boton tarjeta-boton--logs">Logs</button>
+                </div>
+            </div>`;
+    }
+
+    async function actualizar() {
+        const btn = document.getElementById('btn-actualizar');
+        btn.disabled = true;
+        btn.textContent = 'Actualizando...';
+
+        try {
+            const resp = await fetch('/api/contenedores');
+            const lista = await resp.json();
+            const grid = document.getElementById('contenedores-grid');
+            grid.innerHTML = lista.length
+                ? lista.map(renderTarjeta).join('')
+                : '<p class="vista-subtitulo">No hay contenedores.</p>';
+            seg = 0;
+            timerEl.textContent = 'ahora';
+        } catch (e) {
+            console.error('Error al actualizar:', e);
+        }
+
+        btn.disabled = false;
+        btn.textContent = 'Actualizar';
+    }
+</script>
+
 {{end}}

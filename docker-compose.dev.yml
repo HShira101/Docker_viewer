@@ -1,15 +1,32 @@
 services:
-  app:
+  front:
     build:
       context: .
-      target: dev
+      target: front-dev
     ports:
       - "10000:10000"
     volumes:
       - ./Front:/app/Front
-      - go_mod_cache:/root/go/pkg/mod
+      - go_mod_cache_front:/root/go/pkg/mod
+    environment:
+      - BACK_URL=${BACK_URL}
+    depends_on:
+      - back
+    restart: unless-stopped
+
+  back:
+    build:
+      context: .
+      target: back-dev
+    volumes:
+      - ./Back:/app/Back
+      - go_mod_cache_back:/root/go/pkg/mod
+      - ./database:/data
       - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DB_PATH=${DB_PATH}
     restart: unless-stopped
 
 volumes:
-  go_mod_cache:
+  go_mod_cache_front:
+  go_mod_cache_back:

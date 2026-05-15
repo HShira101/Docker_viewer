@@ -1,3 +1,30 @@
+/* --------- Barra superior --------- */
+.contenedores-barra {
+    margin-bottom: 24px;
+    /* Propiedades - Flex */
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.ultima-actualizacion {
+    font-size: 12px;
+    color: var(--text-light);
+    margin-top: 4px;
+    display: block;
+}
+
+.boton-actualizar {
+    padding: 8px 18px;
+    background: var(--sidebar-bg);
+    font-size: 13px;
+    transition: opacity 0.15s;
+    white-space: nowrap;
+}
+
+.boton-actualizar:hover { opacity: 0.85; }
+
 /* --------- Grid de contenedores --------- */
 .contenedores-grid {
     display: grid;

@@ -7,10 +7,10 @@ type DatosLayout struct {
 }
 
 type Contenedor struct {
-	ID     string
-	Nombre string
-	Imagen string
-	Estado string
+	ID     string `json:"id"`
+	Nombre string `json:"nombre"`
+	Imagen string `json:"imagen"`
+	Estado string `json:"estado"`
 }
 
 type DatosContenedores struct {

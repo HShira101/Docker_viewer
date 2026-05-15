@@ -11,14 +11,6 @@ func (c *Controlador) MostrarInicio(w http.ResponseWriter, r *http.Request) {
 	c.plantillas.Inicio.ExecuteTemplate(w, "layout.html", datos)
 }
 
-func (c *Controlador) MostrarContenedores(w http.ResponseWriter, r *http.Request) {
-	datos := DatosContenedores{
-		DatosLayout:  DatosLayout{NombreUsuario: "Shira", PaginaActual: "contenedores", CSS: "contenedores.css"},
-		Contenedores: obtenerContenedores(),
-	}
-	c.plantillas.Contenedores.ExecuteTemplate(w, "layout.html", datos)
-}
-
 func (c *Controlador) MostrarLogs(w http.ResponseWriter, r *http.Request) {
 	datos := DatosLayout{NombreUsuario: "Shira", PaginaActual: "logs"}
 	c.plantillas.Logs.ExecuteTemplate(w, "layout.html", datos)

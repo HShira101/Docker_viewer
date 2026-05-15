@@ -38,6 +38,7 @@ func main() {
 	rute.HandleFunc("POST /login", controlador.EntrarLogin)
 	rute.HandleFunc("POST /logout", controlador.CerrarSesion)
 	rute.HandleFunc("GET /contenedores", controlador.MostrarContenedores)
+	rute.HandleFunc("GET /api/contenedores", controlador.APIContenedores)
 	rute.HandleFunc("GET /logs", controlador.MostrarLogs)
 	rute.HandleFunc("GET /", controlador.MostrarInicio)
 
