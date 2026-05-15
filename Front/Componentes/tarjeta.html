@@ -1,0 +1,33 @@
+{{define "tarjeta"}}
+<div class="tarjeta">
+
+    <div class="tarjeta-cabecera">
+        <span class="tarjeta-indicador {{if eq .Estado "running"}}tarjeta-indicador--activo{{else}}tarjeta-indicador--inactivo{{end}}"></span>
+        <span class="tarjeta-nombre">{{.Nombre}}</span>
+        <span class="tarjeta-estado {{if eq .Estado "running"}}tarjeta-estado--activo{{else}}tarjeta-estado--inactivo{{end}}">
+            {{if eq .Estado "running"}}Activo{{else}}Detenido{{end}}
+        </span>
+    </div>
+
+    <div class="tarjeta-cuerpo">
+        <div class="tarjeta-fila">
+            <span class="tarjeta-label">Imagen</span>
+            <span class="tarjeta-valor">{{.Imagen}}</span>
+        </div>
+        <div class="tarjeta-fila">
+            <span class="tarjeta-label">ID</span>
+            <span class="tarjeta-valor tarjeta-id">{{.ID}}</span>
+        </div>
+    </div>
+
+    <div class="tarjeta-acciones">
+        {{if eq .Estado "running"}}
+        <button class="tarjeta-boton tarjeta-boton--detener">Detener</button>
+        {{else}}
+        <button class="tarjeta-boton tarjeta-boton--iniciar">Iniciar</button>
+        {{end}}
+        <button class="tarjeta-boton tarjeta-boton--logs">Logs</button>
+    </div>
+
+</div>
+{{end}}

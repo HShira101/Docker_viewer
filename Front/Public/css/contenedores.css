@@ -1,0 +1,123 @@
+/* --------- Grid de contenedores --------- */
+.contenedores-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+/* --------- Tarjeta --------- */
+.tarjeta {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    /* Propiedades - Flex */
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    overflow: hidden;
+}
+
+.tarjeta-cabecera {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    /* Propiedades - Flex */
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.tarjeta-indicador {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    /* Propiedades - Flex */
+    flex-shrink: 0;
+}
+
+.tarjeta-indicador--activo   { background: var(--verde); }
+.tarjeta-indicador--inactivo { background: var(--rojo); }
+
+.tarjeta-nombre {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    /* Propiedades - Flex */
+    flex: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.tarjeta-estado {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.tarjeta-estado--activo   { background: #dcfce7; color: #16a34a; }
+.tarjeta-estado--inactivo { background: #fee2e2; color: #dc2626; }
+
+.tarjeta-cuerpo {
+    padding: 12px 16px;
+    /* Propiedades - Flex */
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.tarjeta-fila {
+    /* Propiedades - Flex */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+
+.tarjeta-label {
+    font-size: 12px;
+    color: var(--text-light);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    /* Propiedades - Flex */
+    flex-shrink: 0;
+}
+
+.tarjeta-valor {
+    font-size: 13px;
+    color: var(--text);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.tarjeta-id {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    color: var(--text-light);
+}
+
+.tarjeta-acciones {
+    padding: 10px 16px;
+    border-top: 1px solid var(--border);
+    background: #f8fafc;
+    /* Propiedades - Flex */
+    display: flex;
+    gap: 8px;
+}
+
+.tarjeta-boton {
+    padding: 6px 14px;
+    font-size: 12px;
+    border-radius: 6px;
+}
+
+.tarjeta-boton--iniciar { background: var(--verde); }
+.tarjeta-boton--detener { background: var(--rojo); }
+.tarjeta-boton--logs    { background: var(--sidebar-bg); }
+
+.tarjeta-boton:hover { opacity: 0.85; }

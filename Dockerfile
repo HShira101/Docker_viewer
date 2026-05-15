@@ -2,6 +2,8 @@
 FROM golang:1.25-alpine AS dev
 RUN go install github.com/air-verse/air@latest
 WORKDIR /app/Front
+COPY Front/go.mod ./
+RUN go mod download
 EXPOSE 10000
 CMD ["air"]
 

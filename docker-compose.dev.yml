@@ -8,6 +8,7 @@ services:
     volumes:
       - ./Front:/app/Front
       - go_mod_cache:/root/go/pkg/mod
+      - /var/run/docker.sock:/var/run/docker.sock
     restart: unless-stopped
 
 volumes:

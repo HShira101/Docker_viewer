@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Docker Viewer — Comandos</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      padding: 40px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      color: #58a6ff;
+      border-bottom: 2px solid #21262d;
+      padding-bottom: 12px;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: #8b949e;
+      font-size: 0.9rem;
+      margin-bottom: 36px;
+    }
+
+    h2 {
+      font-size: 1rem;
+      color: #79c0ff;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 14px;
+      margin-top: 32px;
+    }
+
+    .card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin-bottom: 16px;
+    }
+
+    .card .label {
+      font-size: 0.78rem;
+      color: #8b949e;
+      margin-bottom: 10px;
+      font-style: italic;
+    }
+
+    code {
+      display: block;
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      padding: 12px 16px;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 0.95rem;
+      color: #a5d6ff;
+      white-space: pre;
+      margin-bottom: 8px;
+    }
+
+    code:last-child { margin-bottom: 0; }
+
+    .tag {
+      display: inline-block;
+      font-size: 0.72rem;
+      padding: 2px 8px;
+      border-radius: 20px;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    .tag-dev  { background: #1f6feb33; color: #58a6ff; border: 1px solid #1f6feb; }
+    .tag-prod { background: #238636aa; color: #3fb950; border: 1px solid #238636; }
+    .tag-stop { background: #da363333; color: #f85149; border: 1px solid #da3633; }
+
+    .note {
+      background: #1c2128;
+      border-left: 3px solid #58a6ff;
+      padding: 12px 16px;
+      border-radius: 0 6px 6px 0;
+      font-size: 0.85rem;
+      color: #8b949e;
+      margin-top: 32px;
+    }
+
+    .note strong { color: #e6edf3; }
+
+    footer {
+      margin-top: 40px;
+      font-size: 0.78rem;
+      color: #484f58;
+      text-align: center;
+    }
+
+    @media print {
+      body { background: #fff; color: #000; padding: 20px; }
+      h1   { color: #1a56bb; }
+      h2   { color: #1a56bb; }
+      .card { background: #f6f8fa; border-color: #d0d7de; }
+      code  { background: #f6f8fa; border-color: #d0d7de; color: #0550ae; }
+      .note { background: #f0f6ff; border-left-color: #1a56bb; color: #444; }
+      .tag-dev  { background: #ddf4ff; color: #0969da; border-color: #0969da; }
+      .tag-prod { background: #dafbe1; color: #1a7f37; border-color: #1a7f37; }
+      .tag-stop { background: #fff0ee; color: #cf222e; border-color: #cf222e; }
+      footer { color: #888; }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Docker Viewer — Comandos Docker</h1>
+  <p class="subtitle">Referencia rápida · Javier Navarro (Shira) · 2026</p>
+
+  <!-- DESARROLLO -->
+  <h2>Desarrollo</h2>
+
+  <div class="card">
+    <span class="tag tag-dev">Primera vez / tras cambios</span>
+    <div class="label">Construye la imagen y levanta el entorno de desarrollo</div>
+    <code>docker compose -f docker-compose.dev.yml up --build</code>
+  </div>
+
+  <div class="card">
+    <span class="tag tag-dev">Arranque normal</span>
+    <div class="label">Levanta sin reconstruir (para uso cotidiano, hot-reload activo)</div>
+    <code>docker compose -f docker-compose.dev.yml up</code>
+  </div>
+
+  <!-- PRODUCCIÓN -->
+  <h2>Producción</h2>
+
+  <div class="card">
+    <span class="tag tag-prod">Primera vez / tras cambios en código o Dockerfile</span>
+    <div class="label">Construye y levanta en modo producción</div>
+    <code>docker compose up --build</code>
+  </div>
+
+  <div class="card">
+    <span class="tag tag-prod">Arranque normal</span>
+    <div class="label">Levanta sin reconstruir</div>
+    <code>docker compose up</code>
+  </div>
+
+  <!-- PARAR -->
+  <h2>Parar</h2>
+
+  <div class="card">
+    <span class="tag tag-stop">Parar y borrar volúmenes (rebuild limpio)</span>
+    <div class="label">Detiene todos los servicios y elimina los volúmenes</div>
+    <code>docker compose down -v</code>
+  </div>
+
+  <!-- NOTA -->
+  <div class="note">
+    <strong>-f docker-compose.dev.yml</strong> le dice a Docker qué archivo compose usar.<br>
+    Sin ese flag usa <code style="display:inline; border:none; padding:0; background:none; font-size:inherit; color:inherit;">docker-compose.yml</code> (producción) por defecto.<br><br>
+    App disponible en <strong>http://localhost:10000</strong>
+  </div>
+
+  <footer>Docker Viewer · github.com/HShira101/Docker_viewer</footer>
+
+</body>
+</html>

@@ -1,6 +1,11 @@
 {{define "content"}}
-<div class="vista-placeholder">
-    <h2 class="vista-titulo">Contenedores</h2>
-    <p class="vista-subtitulo">Próximamente disponible — Fase 2.</p>
+<h2 class="vista-titulo">Contenedores</h2>
+
+<div class="contenedores-grid">
+    {{range .Contenedores}}
+        {{template "tarjeta" .}}
+    {{else}}
+        <p class="vista-subtitulo">No se pudo conectar con Docker o no hay contenedores.</p>
+    {{end}}
 </div>
 {{end}}

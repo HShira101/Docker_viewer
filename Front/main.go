@@ -10,7 +10,7 @@ import (
 	controladores "docker_viewer/front/Controladores"
 )
 
-//go:embed Layout Login Vistas Public
+//go:embed Layout Login Vistas Public Componentes
 var archivos embed.FS
 
 func main() {
@@ -19,7 +19,7 @@ func main() {
 		// Inicialización de las plantillas
 		Login:        template.Must(template.ParseFS(archivos, "Login/login.html")),
 		Inicio:       template.Must(template.ParseFS(archivos, "Layout/layout.html", "Vistas/inicio.html")),
-		Contenedores: template.Must(template.ParseFS(archivos, "Layout/layout.html", "Vistas/contenedores.html")),
+		Contenedores: template.Must(template.ParseFS(archivos, "Layout/layout.html", "Vistas/contenedores.html", "Componentes/tarjeta.html")),
 		Logs:         template.Must(template.ParseFS(archivos, "Layout/layout.html", "Vistas/logs.html")),
 	}
 
