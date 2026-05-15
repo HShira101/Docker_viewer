@@ -1,5 +1,10 @@
 package controladores
 
+// ---- Datos para la vista de login ----
+type DatosLogin struct {
+	Error string // ← mensaje de error a mostrar bajo el formulario (vacío si no hay error)
+}
+
 // ---- Datos que se pasan a todas las vistas que usan el layout ----
 type DatosLayout struct {
 	NombreUsuario string // ← nombre del usuario autenticado

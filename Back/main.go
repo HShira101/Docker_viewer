@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 
+	autenticacion "docker_viewer/back/Autenticacion"
 	contenedores "docker_viewer/back/Contenedores"
 	database "docker_viewer/back/Database"
 )
@@ -28,7 +29,8 @@ func main() {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("ok")) // ← usado por el healthcheck del docker-compose
 	})
-	mux.HandleFunc("GET /api/contenedores",            contenedores.Listar)
+	mux.HandleFunc("POST /api/auth/login",                autenticacion.Login)
+	mux.HandleFunc("GET /api/contenedores",               contenedores.Listar)
 	mux.HandleFunc("POST /api/contenedores/{id}/iniciar", contenedores.Iniciar)
 	mux.HandleFunc("POST /api/contenedores/{id}/detener", contenedores.Detener)
 

@@ -33,6 +33,11 @@
                 <input type="password" name="password" class="login-input" placeholder="••••••" autocomplete="current-password">
             </div>
 
+            {{if .Error}}
+            <!-- ---- Mensaje de error de autenticación ---- -->
+            <p class="login-error">{{.Error}}</p>
+            {{end}}
+
             <button type="submit" class="login-boton">Entrar</button>
 
         </form>

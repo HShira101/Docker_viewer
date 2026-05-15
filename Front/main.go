@@ -8,11 +8,23 @@ import (
 	"net/http"
 
 	controladores "docker_viewer/front/Controladores"
+	sesion "docker_viewer/front/Sesion"
 )
 
 // ---- Embebe carpetas estáticas en el binario compilado ----
 //go:embed Layout Login Vistas Public Componentes
 var archivos embed.FS
+
+// ---- Middleware que redirige al login si no hay sesión activa ----
+func proteger(siguiente http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if !sesion.EstaAutenticado(r) {
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
+		}
+		siguiente(w, r)
+	}
+}
 
 // ---- Punto de entrada del servidor frontend ----
 func main() {
@@ -36,15 +48,19 @@ func main() {
 	rute.Handle("GET /public/", http.StripPrefix("/public/", http.FileServer(http.FS(publicFS))))
 
 	controlador := controladores.Nuevo(plantillas)
-	rute.HandleFunc("GET /login",            controlador.MostrarLogin)
-	rute.HandleFunc("POST /login",           controlador.EntrarLogin)
-	rute.HandleFunc("POST /logout",          controlador.CerrarSesion)
-	rute.HandleFunc("GET /contenedores",     controlador.MostrarContenedores)
-	rute.HandleFunc("GET /api/contenedores",               controlador.APIContenedores) // ← endpoint para el fetch del botón actualizar
-	rute.HandleFunc("POST /api/contenedores/{id}/iniciar", controlador.APIIniciar)
-	rute.HandleFunc("POST /api/contenedores/{id}/detener", controlador.APIDetener)
-	rute.HandleFunc("GET /logs",             controlador.MostrarLogs)
-	rute.HandleFunc("GET /",                 controlador.MostrarInicio)
+
+	// ---- Rutas públicas: login y assets ----
+	rute.HandleFunc("GET /login",  controlador.MostrarLogin)
+	rute.HandleFunc("POST /login", controlador.EntrarLogin)
+
+	// ---- Rutas protegidas: requieren sesión activa ----
+	rute.HandleFunc("POST /logout",                        proteger(controlador.CerrarSesion))
+	rute.HandleFunc("GET /contenedores",                   proteger(controlador.MostrarContenedores))
+	rute.HandleFunc("GET /api/contenedores",               proteger(controlador.APIContenedores))
+	rute.HandleFunc("POST /api/contenedores/{id}/iniciar", proteger(controlador.APIIniciar))
+	rute.HandleFunc("POST /api/contenedores/{id}/detener", proteger(controlador.APIDetener))
+	rute.HandleFunc("GET /logs",                           proteger(controlador.MostrarLogs))
+	rute.HandleFunc("GET /",                               proteger(controlador.MostrarInicio))
 
 	log.Println("Frontend en :10000 → http://localhost:10000")
 	log.Fatal(http.ListenAndServe(":10000", rute))
