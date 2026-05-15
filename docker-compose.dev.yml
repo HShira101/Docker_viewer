@@ -25,6 +25,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - DB_PATH=${DB_PATH}
+      - APP_USUARIO=${APP_USUARIO}
+      - APP_PASSWORD=${APP_PASSWORD}
     restart: unless-stopped
 
 volumes:
