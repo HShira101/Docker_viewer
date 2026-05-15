@@ -5,35 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Docker Viewer</title>
     <link rel="stylesheet" href="/public/css/layout.css">
-    {{if .CSS}}<link rel="stylesheet" href="/public/css/{{.CSS}}">{{end}}
+    {{if .CSS}}<link rel="stylesheet" href="/public/css/{{.CSS}}">{{end}}<!-- ← carga CSS extra según la vista activa -->
 </head>
 <body class="app-pagina">
 
-    <!-- Barra lateral izquierda -->
+    <!-- ---- Barra lateral izquierda ---- -->
     <aside class="sidebar">
 
+        <!-- ---- Cabecera del sidebar: logo y usuario ---- -->
         <div class="sidebar-cabecera">
             <svg class="sidebar-icono" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/>
             </svg>
             <div>
                 <div class="sidebar-titulo">Docker Viewer</div>
-                <div class="sidebar-usuario">{{.NombreUsuario}}</div>
+                <div class="sidebar-usuario">{{.NombreUsuario}}</div><!-- ← nombre del usuario autenticado -->
             </div>
         </div>
+        <!-- ---- Fin Cabecera del sidebar ---- -->
 
+        <!-- ---- Resumen de consumo de recursos del sistema ---- -->
         <div class="sidebar-recursos">
             <div class="recurso-titulo">Consumo</div>
             <div class="recurso-fila">
                 <span class="recurso-label">CPU</span>
-                <span class="recurso-valor" id="stat-cpu">--%</span>
+                <span class="recurso-valor" id="stat-cpu">--%</span><!-- ← actualizado vía JS -->
             </div>
             <div class="recurso-fila">
                 <span class="recurso-label">RAM</span>
-                <span class="recurso-valor" id="stat-ram">-- / -- GB</span>
+                <span class="recurso-valor" id="stat-ram">-- / -- GB</span><!-- ← actualizado vía JS -->
             </div>
         </div>
+        <!-- ---- Fin Resumen de consumo ---- -->
 
+        <!-- ---- Navegación lateral: marca el enlace activo según la página actual ---- -->
         <nav class="sidebar-nav">
             <a href="/" class="nav-enlace{{if eq .PaginaActual "inicio"}} activo{{end}}">
                 <svg class="nav-icono" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -53,26 +58,31 @@
                 Logs
             </a>
         </nav>
+        <!-- ---- Fin Navegación lateral ---- -->
 
     </aside>
-    <!-- Fin Barra lateral izquierda -->
+    <!-- ---- Fin Barra lateral izquierda ---- -->
 
-    <!-- Área principal -->
+    <!-- ---- Área principal: topbar + contenido de la vista activa ---- -->
     <div class="app-principal">
 
+        <!-- ---- Barra superior: título y botón de cerrar sesión ---- -->
         <header class="topbar">
             <h1 class="topbar-titulo">Monitor Docker</h1>
             <form action="/logout" method="POST">
                 <button type="submit" class="boton-salir">Cerrar sesión</button>
             </form>
         </header>
+        <!-- ---- Fin Barra superior ---- -->
 
+        <!-- ---- Zona de contenido: cada vista inyecta su HTML aquí ---- -->
         <main class="contenido-principal">
             {{block "content" .}}{{end}}
         </main>
+        <!-- ---- Fin Zona de contenido ---- -->
 
     </div>
-    <!-- Fin Área principal -->
+    <!-- ---- Fin Área principal ---- -->
 
     <script src="/public/js/app.js"></script>
 </body>

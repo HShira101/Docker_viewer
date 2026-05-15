@@ -11,11 +11,13 @@ import (
 	database "docker_viewer/back/Database"
 )
 
+// ---- Hace una petición GET a la API de Docker vía Unix socket ----
 func dockerGet(ruta string, destino any) error {
+	// --- Recibe ruta como string con el endpoint Docker y destino como puntero a struct ---
 	cliente := &http.Client{
 		Transport: &http.Transport{
 			DialContext: func(ctx context.Context, _, _ string) (net.Conn, error) {
-				return (&net.Dialer{}).DialContext(ctx, "unix", "/var/run/docker.sock")
+				return (&net.Dialer{}).DialContext(ctx, "unix", "/var/run/docker.sock") // ← conecta al socket Unix de Docker
 			},
 		},
 	}
@@ -27,6 +29,7 @@ func dockerGet(ruta string, destino any) error {
 	return json.NewDecoder(resp.Body).Decode(destino)
 }
 
+// ---- Consulta Docker y actualiza o inserta los contenedores en SQLite ----
 func Actualizar() {
 	var raw []struct {
 		Id    string   `json:"Id"`
@@ -34,6 +37,7 @@ func Actualizar() {
 		Image string   `json:"Image"`
 		State string   `json:"State"`
 	}
+
 	if err := dockerGet("/containers/json?all=true", &raw); err != nil {
 		log.Println("Docker socket:", err)
 		return
@@ -41,9 +45,9 @@ func Actualizar() {
 
 	ahora := time.Now()
 	for _, r := range raw {
-		nombre := r.Id[:12]
+		nombre := r.Id[:12] // ← fallback: primeros 12 caracteres del ID
 		if len(r.Names) > 0 {
-			nombre = r.Names[0][1:] // Docker prefija con "/"
+			nombre = r.Names[0][1:] // ← Docker prefija el nombre con "/", se elimina
 		}
 		database.DB.Exec(`
 			INSERT INTO contenedores_running (id, nombre, imagen, estado, ultima_consulta)

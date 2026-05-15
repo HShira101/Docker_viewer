@@ -1,22 +1,27 @@
 {{define "content"}}
 
+<!-- ---- Barra superior: título, timer de última actualización y botón actualizar ---- -->
 <div class="contenedores-barra">
     <div>
         <h2 class="vista-titulo">Contenedores</h2>
-        <span class="ultima-actualizacion">Última actualización: <span id="timer">ahora</span></span>
+        <span class="ultima-actualizacion">Última actualización: <span id="timer">ahora</span></span><!-- ← contador JS -->
     </div>
     <button class="boton-actualizar" id="btn-actualizar" onclick="actualizar()">Actualizar</button>
 </div>
+<!-- ---- Fin Barra superior ---- -->
 
+<!-- ---- Grid de tarjetas de contenedores ---- -->
 <div class="contenedores-grid" id="contenedores-grid">
     {{range .Contenedores}}
-        {{template "tarjeta" .}}
+        {{template "tarjeta" .}}<!-- ← renderiza componente tarjeta por cada contenedor -->
     {{else}}
         <p class="vista-subtitulo">No se pudo conectar con el backend o no hay contenedores.</p>
     {{end}}
 </div>
+<!-- ---- Fin Grid de tarjetas ---- -->
 
 <script>
+    // ---- Timer: muestra cuánto tiempo lleva la página sin refrescar datos ----
     let seg = 0;
     const timerEl = document.getElementById('timer');
 
@@ -30,6 +35,7 @@
         }
     }, 1000);
 
+    // ---- Construye el HTML de una tarjeta a partir de los datos JSON del contenedor ----
     function renderTarjeta(c) {
         const activo = c.estado === 'running';
         return `
@@ -61,18 +67,21 @@
             </div>`;
     }
 
+    // ---- Pide datos frescos al backend y actualiza el grid sin recargar la página ----
     async function actualizar() {
         const btn = document.getElementById('btn-actualizar');
         btn.disabled = true;
         btn.textContent = 'Actualizando...';
 
         try {
-            const resp = await fetch('/api/contenedores');
+            const resp  = await fetch('/api/contenedores');
             const lista = await resp.json();
-            const grid = document.getElementById('contenedores-grid');
+            const grid  = document.getElementById('contenedores-grid');
+
             grid.innerHTML = lista.length
                 ? lista.map(renderTarjeta).join('')
                 : '<p class="vista-subtitulo">No hay contenedores.</p>';
+
             seg = 0;
             timerEl.textContent = 'ahora';
         } catch (e) {

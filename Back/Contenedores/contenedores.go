@@ -7,8 +7,9 @@ import (
 	database "docker_viewer/back/Database"
 )
 
+// ---- Handler de GET /api/contenedores: sincroniza Docker, lee SQLite y devuelve JSON ----
 func Listar(w http.ResponseWriter, r *http.Request) {
-	Actualizar()
+	Actualizar() // ← refresca los datos desde Docker antes de responder
 
 	rows, err := database.DB.Query(`
 		SELECT id, nombre, imagen, estado, ultima_consulta
