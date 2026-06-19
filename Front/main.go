@@ -33,7 +33,7 @@ func main() {
 	plantillas := &controladores.Plantillas{
 		Login:        template.Must(template.ParseFS(archivos, "Login/login.html")),
 		Inicio:       template.Must(template.ParseFS(archivos, "Layout/layout.html", "Vistas/inicio.html")),
-		Contenedores: template.Must(template.ParseFS(archivos, "Layout/layout.html", "Vistas/contenedores.html", "Componentes/tarjeta.html")),
+		Contenedores: template.Must(template.ParseFS(archivos, "Layout/layout.html", "Vistas/contenedores.html", "Componentes/tarjeta.html", "Componentes/grupo.html")),
 		Logs:         template.Must(template.ParseFS(archivos, "Layout/layout.html", "Vistas/logs.html")),
 	}
 

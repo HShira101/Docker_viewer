@@ -13,16 +13,22 @@
     </div>
     <!-- ---- Fin Cabecera ---- -->
 
-    <!-- ---- Cuerpo: imagen e ID del contenedor ---- -->
+    <!-- ---- Cuerpo: imagen y puertos del contenedor ---- -->
     <div class="tarjeta-cuerpo">
         <div class="tarjeta-fila">
             <span class="tarjeta-label">Imagen</span>
             <span class="tarjeta-valor">{{.Imagen}}</span>
         </div>
+        {{if .Puertos}}
         <div class="tarjeta-fila">
-            <span class="tarjeta-label">ID</span>
-            <span class="tarjeta-valor tarjeta-id">{{.ID}}</span>
+            <span class="tarjeta-label">Puertos</span>
+            <span class="tarjeta-puertos">
+                {{range .Puertos}}
+                <a class="tarjeta-puerto" data-puerto="{{.PublicPort}}" href="#" target="_blank" rel="noopener">:{{.PublicPort}}</a>
+                {{end}}
+            </span>
         </div>
+        {{end}}
     </div>
     <!-- ---- Fin Cuerpo ---- -->
 

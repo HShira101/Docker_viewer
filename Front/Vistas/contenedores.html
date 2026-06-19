@@ -13,15 +13,15 @@
 </div>
 <!-- ---- Fin Barra superior ---- -->
 
-<!-- ---- Grid de tarjetas de contenedores ---- -->
-<div class="contenedores-grid" id="contenedores-grid">
-    {{range .Contenedores}}
-        {{template "tarjeta" .}}<!-- ← renderiza componente tarjeta por cada contenedor -->
+<!-- ---- Grupos de contenedores ---- -->
+<div class="contenedores-grupos" id="contenedores-grupos">
+    {{range .Grupos}}
+        {{template "grupo" .}}
     {{else}}
         <p class="vista-subtitulo">No se pudo conectar con el backend o no hay contenedores.</p>
     {{end}}
 </div>
-<!-- ---- Fin Grid de tarjetas ---- -->
+<!-- ---- Fin Grupos de contenedores ---- -->
 
 <script>
     // ---- Timer: muestra cuánto tiempo lleva la página sin refrescar datos ----
@@ -46,6 +46,25 @@
         barra.className = 'contenedores-estado contenedores-estado--' + tipo;
     }
 
+    // ---- Genera links de puertos clicables usando el host actual del browser ----
+    function renderPuertos(puertos) {
+        if (!puertos || !puertos.length) return '';
+        const links = puertos
+            .map(p => `<a class="tarjeta-puerto" href="http://${window.location.hostname}:${p.PublicPort}" target="_blank" rel="noopener">:${p.PublicPort}</a>`)
+            .join('');
+        return `<div class="tarjeta-fila">
+            <span class="tarjeta-label">Puertos</span>
+            <span class="tarjeta-puertos">${links}</span>
+        </div>`;
+    }
+
+    // ---- Fija el href correcto en los puertos del render inicial del servidor ----
+    function initPuertos() {
+        document.querySelectorAll('a.tarjeta-puerto').forEach(a => {
+            a.href = `http://${window.location.hostname}:${a.dataset.puerto}`;
+        });
+    }
+
     // ---- Construye el HTML de una tarjeta a partir de los datos JSON del contenedor ----
     function renderTarjeta(c) {
         const activo = c.estado === 'running';
@@ -66,10 +85,7 @@
                         <span class="tarjeta-label">Imagen</span>
                         <span class="tarjeta-valor">${c.imagen}</span>
                     </div>
-                    <div class="tarjeta-fila">
-                        <span class="tarjeta-label">ID</span>
-                        <span class="tarjeta-valor tarjeta-id">${c.id}</span>
-                    </div>
+                    ${renderPuertos(c.puertos)}
                 </div>
                 <div class="tarjeta-acciones">
                     ${botonAccion}
@@ -78,19 +94,50 @@
             </div>`;
     }
 
-    // ---- Pide datos frescos al backend y actualiza el grid sin recargar la página ----
+    // ---- Agrupa la lista plana de contenedores por compose_project ----
+    function agrupar(lista) {
+        const mapa = new Map();
+        for (const c of lista) {
+            const key = c.compose_project || '';
+            if (!mapa.has(key)) mapa.set(key, []);
+            mapa.get(key).push(c);
+        }
+        // proyectos nombrados primero, "sin proyecto" (key vacía) al final
+        return [...mapa.entries()].sort((a, b) => {
+            if (!a[0]) return 1;
+            if (!b[0]) return -1;
+            return a[0].localeCompare(b[0]);
+        });
+    }
+
+    // ---- Construye el HTML de un grupo con su cabecera y sus tarjetas ----
+    function renderGrupo(nombre, contenedores) {
+        const label = nombre || 'Sin proyecto';
+        return `
+            <div class="grupo">
+                <div class="grupo-cabecera">
+                    <span class="grupo-nombre">${label}</span>
+                    <span class="grupo-contador">${contenedores.length}</span>
+                </div>
+                <div class="grupo-grid">
+                    ${contenedores.map(renderTarjeta).join('')}
+                </div>
+            </div>`;
+    }
+
+    // ---- Pide datos frescos al backend, agrupa y actualiza la vista sin recargar ----
     async function actualizar() {
         const btn = document.getElementById('btn-actualizar');
         btn.disabled = true;
         btn.textContent = 'Actualizando...';
 
         try {
-            const resp  = await fetch('/api/contenedores');
-            const lista = await resp.json();
-            const grid  = document.getElementById('contenedores-grid');
+            const resp   = await fetch('/api/contenedores');
+            const lista  = await resp.json();
+            const wrapper = document.getElementById('contenedores-grupos');
 
-            grid.innerHTML = lista.length
-                ? lista.map(renderTarjeta).join('')
+            wrapper.innerHTML = lista.length
+                ? agrupar(lista).map(([nombre, contenedores]) => renderGrupo(nombre, contenedores)).join('')
                 : '<p class="vista-subtitulo">No hay contenedores.</p>';
 
             seg = 0;
@@ -102,6 +149,8 @@
         btn.disabled = false;
         btn.textContent = 'Actualizar';
     }
+
+    initPuertos(); // ← fija hrefs en el render inicial del servidor
 
     // ---- Envía acción iniciar/detener al backend y muestra el resultado en la barra ----
     async function accionContenedor(btn) {

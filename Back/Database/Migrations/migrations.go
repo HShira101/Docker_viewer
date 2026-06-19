@@ -35,4 +35,7 @@ var lista = []string{
 
 	// 002 — agrega proyecto Compose (ignorar error si la columna ya existe)
 	`ALTER TABLE contenedores_running ADD COLUMN compose_project TEXT NOT NULL DEFAULT ''`,
+
+	// 003 — agrega puertos publicados como JSON (ignorar error si la columna ya existe)
+	`ALTER TABLE contenedores_running ADD COLUMN puertos TEXT NOT NULL DEFAULT '[]'`,
 }
