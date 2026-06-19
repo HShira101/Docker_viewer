@@ -19,6 +19,8 @@ services:
     build:
       context: .
       target: back-dev
+    ports:
+      - "10001:10001"
     volumes:
       - ./Back:/app/Back
       - go_mod_cache_back:/root/go/pkg/mod
