@@ -5,8 +5,8 @@
 
     <!-- ---- Cabecera: indicador de estado, nombre y timestamp último log ---- -->
     <div class="tarjeta-cabecera">
-        <span class="tarjeta-indicador {{if eq .Estado "running"}}tarjeta-indicador--activo{{else}}tarjeta-indicador--inactivo{{end}}"></span>
         <span class="tarjeta-nombre">{{.Nombre}}</span>
+        <span class="tarjeta-indicador {{if eq .Estado "running"}}tarjeta-indicador--activo{{else}}tarjeta-indicador--inactivo{{end}}"></span>
         <span class="tarjeta-log-ultima" data-ts="{{.UltimaLogGuardado}}">
             {{if .UltimaLogGuardado}}...{{else}}Sin logs{{end}}
         </span>

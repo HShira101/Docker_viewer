@@ -70,6 +70,35 @@
     gap: 16px;
 }
 
+/* --------- Cabecera de tarjeta compartida --------- */
+.tarjeta-cabecera {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.tarjeta-nombre {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    flex: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.tarjeta-indicador {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.tarjeta-indicador--activo   { background: var(--verde); }
+.tarjeta-indicador--inactivo { background: var(--rojo); }
+
 /* --------- Tarjeta de log --------- */
 .tarjeta-log {
     background: var(--white);
@@ -147,7 +176,3 @@
     padding: 4px 0;
 }
 
-/* --------- Grid de logs más ancho (tarjetas más grandes que contenedores) --------- */
-.grupo-grid--logs {
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-}
