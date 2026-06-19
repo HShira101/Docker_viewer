@@ -23,7 +23,7 @@ func main() {
 		log.Fatal("DB:", err)
 	}
 
-	// ---- Registra rutas HTTP ----
+	// ---- Registra rutas HTTP, Endpoint ----
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)

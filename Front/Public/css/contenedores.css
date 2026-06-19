@@ -42,11 +42,11 @@
 .contenedores-estado--ok       { display: flex; background: #dcfce7; color: #16a34a; }
 .contenedores-estado--error    { display: flex; background: #fee2e2; color: #dc2626; }
 
-/* --------- Grid de contenedores --------- */
-.contenedores-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 16px;
+/* --------- Contenedor de grupos --------- */
+.contenedores-grupos {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
 }
 
 /* --------- Tarjeta --------- */
@@ -165,3 +165,91 @@
 .tarjeta-boton--logs    { background: var(--sidebar-bg); }
 
 .tarjeta-boton:hover { opacity: 0.85; }
+
+/* --------- Links de puertos --------- */
+.tarjeta-puertos {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-end;
+}
+
+.tarjeta-puerto-fila {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.tarjeta-puerto-ip {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    min-width: 28px;
+}
+
+.tarjeta-puerto {
+    font-size: 12px;
+    font-weight: 600;
+    font-family: 'Courier New', monospace;
+    color: var(--azul);
+    background: #e0f2fe;
+    padding: 2px 7px;
+    border-radius: 4px;
+    text-decoration: none;
+}
+
+.tarjeta-puerto:hover {
+    background: var(--azul);
+    color: var(--white);
+}
+
+.tarjeta-puerto-flecha {
+    font-size: 11px;
+    color: var(--text-light);
+}
+
+.tarjeta-puerto-privado {
+    font-size: 12px;
+    font-family: 'Courier New', monospace;
+    color: var(--text-light);
+}
+
+/* --------- Grupo de contenedores --------- */
+.grupo {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.grupo-cabecera {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border);
+}
+
+.grupo-nombre {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.grupo-contador {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-light);
+    background: var(--gris);
+    padding: 2px 8px;
+    border-radius: 20px;
+}
+
+.grupo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}

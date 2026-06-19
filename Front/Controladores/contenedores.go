@@ -55,11 +55,36 @@ func (c *Controlador) proxyAccion(w http.ResponseWriter, r *http.Request, accion
 	io.Copy(w, resp.Body) // ← copia la respuesta del back directamente al browser
 }
 
+// ---- Agrupa una lista plana de contenedores por compose_project ----
+func agruparContenedores(lista []Contenedor) []Grupo {
+	indice := map[string]int{}
+	grupos := []Grupo{}
+
+	for _, c := range lista {
+		key := c.ComposeProject
+		if i, existe := indice[key]; existe {
+			grupos[i].Contenedores = append(grupos[i].Contenedores, c)
+		} else {
+			indice[key] = len(grupos)
+			grupos = append(grupos, Grupo{Nombre: key, Contenedores: []Contenedor{c}})
+		}
+	}
+
+	// mueve "Sin proyecto" (key vacía) al final
+	for i, g := range grupos {
+		if g.Nombre == "" && i != len(grupos)-1 {
+			grupos = append(grupos[:i], append(grupos[i+1:], g)...)
+			break
+		}
+	}
+	return grupos
+}
+
 // ---- Renderiza la vista de contenedores con los datos del backend ----
 func (c *Controlador) MostrarContenedores(w http.ResponseWriter, r *http.Request) {
 	datos := DatosContenedores{
-		DatosLayout:  DatosLayout{NombreUsuario: sesion.ObtenerUsuario(r), PaginaActual: "contenedores", CSS: "contenedores.css"},
-		Contenedores: obtenerContenedores(),
+		DatosLayout: DatosLayout{NombreUsuario: sesion.ObtenerUsuario(r), PaginaActual: "contenedores", CSS: "contenedores.css"},
+		Grupos:      agruparContenedores(obtenerContenedores()),
 	}
 	c.plantillas.Contenedores.ExecuteTemplate(w, "layout.html", datos)
 }

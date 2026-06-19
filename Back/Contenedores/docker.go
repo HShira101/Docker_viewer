@@ -47,10 +47,17 @@ func clienteDocker() *http.Client {
 // ---- Consulta Docker y actualiza o inserta los contenedores en SQLite ----
 func Actualizar() {
 	var raw []struct {
-		Id    string   `json:"Id"`
-		Names []string `json:"Names"`
-		Image string   `json:"Image"`
-		State string   `json:"State"`
+		Id     string            `json:"Id"`
+		Names  []string          `json:"Names"`
+		Image  string            `json:"Image"`
+		State  string            `json:"State"`
+		Labels map[string]string `json:"Labels"`
+		Ports  []struct {
+			IP          string `json:"IP"`
+			PublicPort  int    `json:"PublicPort"`
+			PrivatePort int    `json:"PrivatePort"`
+			Type        string `json:"Type"`
+		} `json:"Ports"`
 	}
 
 	if err := dockerGet("/containers/json?all=true", &raw); err != nil {
@@ -60,18 +67,37 @@ func Actualizar() {
 
 	ahora := time.Now()
 	for _, r := range raw {
-		nombre := r.Id[:12] // ← fallback: primeros 12 caracteres del ID
+		nombre := r.Id[:12]
 		if len(r.Names) > 0 {
-			nombre = r.Names[0][1:] // ← Docker prefija el nombre con "/", se elimina
+			nombre = r.Names[0][1:]
 		}
+
+		composeProject := r.Labels["com.docker.compose.project"]
+
+		// serializa solo los puertos con mapeo al host (PublicPort > 0)
+		puertos := []Puerto{}
+		for _, p := range r.Ports {
+			if p.PublicPort > 0 {
+				puertos = append(puertos, Puerto{
+					IP:          p.IP,
+					PublicPort:  p.PublicPort,
+					PrivatePort: p.PrivatePort,
+					Type:        p.Type,
+				})
+			}
+		}
+		puertosJSON, _ := json.Marshal(puertos)
+
 		database.DB.Exec(`
-			INSERT INTO contenedores_running (id, nombre, imagen, estado, ultima_consulta)
-			VALUES (?, ?, ?, ?, ?)
+			INSERT INTO contenedores_running (id, nombre, imagen, estado, ultima_consulta, compose_project, puertos)
+			VALUES (?, ?, ?, ?, ?, ?, ?)
 			ON CONFLICT(id) DO UPDATE SET
 				nombre          = excluded.nombre,
 				imagen          = excluded.imagen,
 				estado          = excluded.estado,
-				ultima_consulta = excluded.ultima_consulta
-		`, r.Id, nombre, r.Image, r.State, ahora)
+				ultima_consulta = excluded.ultima_consulta,
+				compose_project = excluded.compose_project,
+				puertos         = excluded.puertos
+		`, r.Id, nombre, r.Image, r.State, ahora, composeProject, string(puertosJSON))
 	}
 }
