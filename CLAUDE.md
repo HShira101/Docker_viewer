@@ -137,19 +137,27 @@ Cuando te pida documentación pdf debes darme un pdf con lo siguiente:
 
 #### Fases de desarollo ################
 
-- Fase 1: creación de carpetas, dockerfile, Front básico (Fase de armar esqueleto).
-  |-> Contenido del front: Login (no funcional, simplemente entrar al hacr click), layout, vista de inicio de ejemplo (No funcional).
+- Fase 1: [COMPLETADA] creación de carpetas, dockerfile, Front básico (Fase de armar esqueleto).
+  |-> Contenido del front: Login (no funcional, simplemente entrar al hacer click), layout, vista de inicio de ejemplo (No funcional).
   |-> Layout
         |-> Navegador lateral izquierdo con resumen de nombre de usuario autenticado, Resumen Uso de recursos, Boton contenedores y Logs.
-- Fase 2: Vista de contendores funcional (la vista principal debe mostrar cont).
-  |-> 1: Lógica de autenticación y hacer vista de login funcional
+
+- Fase 2: [COMPLETADA] Vista de contenedores funcional.
+  |-> 1: Lógica de autenticación y vista de login funcional (SHA256, cookie de sesión).
   |-> 2: Lógica de contenedores
-          |-> Tomar datos de contendores de SQLite.
-          |-> Pedir querry de contenedores a Docker Api.
-          |-> Rellenar/actualizar datos SQlite.
-          |-> Mandarlos al frontend.
-          |-> Front muestra todos los contenedores con sus datos requeridos.
+          |-> Consulta Docker API via Unix socket (/var/run/docker.sock).
+          |-> Upsert de contenedores en SQLite (id, nombre, imagen, estado, compose_project, puertos).
+          |-> Sistema de migraciones en Back/Database/Migrations/.
+          |-> Backend entrega JSON al frontend.
+          |-> Frontend agrupa contenedores por proyecto Compose.
+          |-> Tarjetas muestran: estado, imagen, puertos publicados (IPv4/IPv6 con link al servicio).
+
 - Fase 3: Vista de logs funcional.
+  |-> 1: Logs por contenedor desde Docker API (GET /containers/{id}/logs).
+  |-> 2: Vista de logs en el frontend con filtro por contenedor.
+  |-> 3: Integración con Vector + Victoria Logs para logs persistentes.
+  |-> 4: Botón "Logs" en tarjeta de contenedor abre la vista filtrada.
+
 - Fase 4: Vista de Usuarios funcional.
 - Fase 5: Vista de comandos.
 
