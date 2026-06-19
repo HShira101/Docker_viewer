@@ -53,6 +53,7 @@ func Actualizar() {
 		State  string            `json:"State"`
 		Labels map[string]string `json:"Labels"`
 		Ports  []struct {
+			IP          string `json:"IP"`
 			PublicPort  int    `json:"PublicPort"`
 			PrivatePort int    `json:"PrivatePort"`
 			Type        string `json:"Type"`
@@ -78,6 +79,7 @@ func Actualizar() {
 		for _, p := range r.Ports {
 			if p.PublicPort > 0 {
 				puertos = append(puertos, Puerto{
+					IP:          p.IP,
 					PublicPort:  p.PublicPort,
 					PrivatePort: p.PrivatePort,
 					Type:        p.Type,

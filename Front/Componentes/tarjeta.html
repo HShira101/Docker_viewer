@@ -24,7 +24,12 @@
             <span class="tarjeta-label">Puertos</span>
             <span class="tarjeta-puertos">
                 {{range .Puertos}}
-                <a class="tarjeta-puerto" data-puerto="{{.PublicPort}}" href="#" target="_blank" rel="noopener">:{{.PublicPort}}</a>
+                <span class="tarjeta-puerto-fila">
+                    <span class="tarjeta-puerto-ip">{{if eq .IP "::"}}IPv6{{else}}IPv4{{end}}</span>
+                    <a class="tarjeta-puerto" data-puerto="{{.PublicPort}}" href="#" target="_blank" rel="noopener">{{.PublicPort}}</a>
+                    <span class="tarjeta-puerto-flecha">→</span>
+                    <span class="tarjeta-puerto-privado">{{.PrivatePort}}</span>
+                </span>
                 {{end}}
             </span>
         </div>

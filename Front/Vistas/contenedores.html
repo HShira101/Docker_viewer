@@ -50,7 +50,15 @@
     function renderPuertos(puertos) {
         if (!puertos || !puertos.length) return '';
         const links = puertos
-            .map(p => `<a class="tarjeta-puerto" href="http://${window.location.hostname}:${p.PublicPort}" target="_blank" rel="noopener">:${p.PublicPort}</a>`)
+            .map(p => {
+                const ipLabel = p.IP === '::' ? 'IPv6' : 'IPv4';
+                return `<span class="tarjeta-puerto-fila">
+                    <span class="tarjeta-puerto-ip">${ipLabel}</span>
+                    <a class="tarjeta-puerto" href="http://${window.location.hostname}:${p.PublicPort}" target="_blank" rel="noopener">${p.PublicPort}</a>
+                    <span class="tarjeta-puerto-flecha">→</span>
+                    <span class="tarjeta-puerto-privado">${p.PrivatePort}</span>
+                </span>`;
+            })
             .join('');
         return `<div class="tarjeta-fila">
             <span class="tarjeta-label">Puertos</span>

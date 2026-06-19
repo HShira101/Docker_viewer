@@ -169,9 +169,24 @@
 /* --------- Links de puertos --------- */
 .tarjeta-puertos {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 4px;
-    justify-content: flex-end;
+    align-items: flex-end;
+}
+
+.tarjeta-puerto-fila {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.tarjeta-puerto-ip {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    min-width: 28px;
 }
 
 .tarjeta-puerto {
@@ -188,6 +203,17 @@
 .tarjeta-puerto:hover {
     background: var(--azul);
     color: var(--white);
+}
+
+.tarjeta-puerto-flecha {
+    font-size: 11px;
+    color: var(--text-light);
+}
+
+.tarjeta-puerto-privado {
+    font-size: 12px;
+    font-family: 'Courier New', monospace;
+    color: var(--text-light);
 }
 
 /* --------- Grupo de contenedores --------- */

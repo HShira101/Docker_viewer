@@ -4,6 +4,7 @@ import "time"
 
 // ---- Puerto publicado por un contenedor Docker ----
 type Puerto struct {
+	IP          string `json:"IP"`
 	PublicPort  int    `json:"PublicPort"`
 	PrivatePort int    `json:"PrivatePort"`
 	Type        string `json:"Type"`
