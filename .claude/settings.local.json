@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\Goshy\\\\Desktop\\\\Laravel\\\\Dockerdesktop\\\\app\" -Recurse -Force | Where-Object { $_.Extension -eq \".php\" })"
+    ]
+  }
+}
