@@ -8,6 +8,7 @@ import (
 	autenticacion "docker_viewer/back/Autenticacion"
 	contenedores "docker_viewer/back/Contenedores"
 	database "docker_viewer/back/Database"
+	logs "docker_viewer/back/Logs"
 )
 
 // ---- Punto de entrada del servidor backend ----
@@ -22,6 +23,9 @@ func main() {
 	if err := database.Inicializar(rutaDB); err != nil {
 		log.Fatal("DB:", err)
 	}
+
+	// ---- Arranca el recolector de logs en background ----
+	logs.IniciarTicker()
 
 	// ---- Registra rutas HTTP, Endpoint ----
 	mux := http.NewServeMux()

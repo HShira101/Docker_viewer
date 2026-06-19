@@ -10,9 +10,10 @@ func Aplicar(db *sql.DB) error {
 	for _, m := range lista {
 		if _, err := db.Exec(m); err != nil {
 			// SQLite no soporta ADD COLUMN IF NOT EXISTS — ignorar si la columna ya existe
-			if strings.Contains(err.Error(), "duplicate column name") {
-				continue
-			}
+			if strings.Contains(err.Error(), "duplicate column name") ||
+			strings.Contains(err.Error(), "already exists") {
+			continue
+		}
 			return err
 		}
 	}
@@ -38,4 +39,7 @@ var lista = []string{
 
 	// 003 — agrega puertos publicados como JSON (ignorar error si la columna ya existe)
 	`ALTER TABLE contenedores_running ADD COLUMN puertos TEXT NOT NULL DEFAULT '[]'`,
+
+	// 004 — renombra tabla a nombre genérico sin sufijo _running
+	`ALTER TABLE contenedores_running RENAME TO contenedores`,
 }

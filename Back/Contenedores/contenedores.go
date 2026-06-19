@@ -15,7 +15,7 @@ func Listar(w http.ResponseWriter, r *http.Request) {
 
 	rows, err := database.DB.Query(`
 		SELECT id, nombre, imagen, estado, ultima_consulta, compose_project, puertos
-		FROM contenedores_running
+		FROM contenedores
 		ORDER BY compose_project, nombre
 	`)
 	if err != nil {
@@ -56,7 +56,7 @@ func ejecutarAccion(w http.ResponseWriter, id, accionDocker, textoExito string) 
 	// ---- Comprueba que el contenedor existe en la base de datos ----
 	var nombre string
 	err := database.DB.QueryRow(
-		`SELECT nombre FROM contenedores_running WHERE id = ?`, id,
+		`SELECT nombre FROM contenedores WHERE id = ?`, id,
 	).Scan(&nombre)
 
 	if err == sql.ErrNoRows {

@@ -89,7 +89,7 @@ func Actualizar() {
 		puertosJSON, _ := json.Marshal(puertos)
 
 		database.DB.Exec(`
-			INSERT INTO contenedores_running (id, nombre, imagen, estado, ultima_consulta, compose_project, puertos)
+			INSERT INTO contenedores (id, nombre, imagen, estado, ultima_consulta, compose_project, puertos)
 			VALUES (?, ?, ?, ?, ?, ?, ?)
 			ON CONFLICT(id) DO UPDATE SET
 				nombre          = excluded.nombre,
