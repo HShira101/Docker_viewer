@@ -1,10 +1,97 @@
 {{define "content"}}
 
-<!-- ---- Vista placeholder — pendiente Fase 3 ---- -->
-<div class="vista-placeholder">
-    <h2 class="vista-titulo">Logs</h2>
-    <p class="vista-subtitulo">Próximamente disponible — Fase 3.</p>
+<!-- ---- Barra superior: título y botón actualizar ---- -->
+<div class="contenedores-barra">
+    <div>
+        <h2 class="vista-titulo">Logs</h2>
+        <span class="ultima-actualizacion">Última actualización: <span id="timer">ahora</span></span>
+    </div>
+    <button class="boton-actualizar" onclick="actualizarLogs()">Actualizar</button>
 </div>
-<!-- ---- Fin Vista placeholder ---- -->
+<!-- ---- Fin Barra superior ---- -->
+
+<!-- ---- Grupos de tarjetas de log ---- -->
+<div class="contenedores-grupos" id="logs-grupos">
+    {{range .Grupos}}
+        {{template "grupo-log" .}}
+    {{else}}
+        <p class="vista-subtitulo">No hay contenedores.</p>
+    {{end}}
+</div>
+<!-- ---- Fin Grupos ---- -->
+
+<script>
+    // ---- Timer ----
+    let seg = 0;
+    const timerEl = document.getElementById('timer');
+    setInterval(() => {
+        seg++;
+        timerEl.textContent = seg < 60
+            ? 'hace ' + seg + 's'
+            : 'hace ' + Math.floor(seg / 60) + 'm ' + (seg % 60) + 's';
+    }, 1000);
+
+    // ---- Formatea un timestamp ISO a texto relativo ----
+    function tiempoRelativo(iso) {
+        if (!iso) return 'Sin logs';
+        const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+        if (diff < 60)  return 'hace ' + diff + 's';
+        if (diff < 3600) return 'hace ' + Math.floor(diff / 60) + 'm';
+        return 'hace ' + Math.floor(diff / 3600) + 'h';
+    }
+
+    // ---- Aplica el tiempo relativo a todos los badges de última recolección ----
+    function actualizarBadges() {
+        document.querySelectorAll('.tarjeta-log-ultima[data-ts]').forEach(el => {
+            el.textContent = tiempoRelativo(el.dataset.ts);
+        });
+    }
+
+    // ---- Renderiza líneas de log dentro de una tarjeta ----
+    function renderLineas(lineas) {
+        if (!lineas || !lineas.length) return '<span class="tarjeta-log-vacio">Sin logs recientes</span>';
+        return lineas.map(l => {
+            const hora = l._time ? new Date(l._time).toLocaleTimeString() : '';
+            const stream = l.stream === 'stderr' ? 'tarjeta-log-stream--err' : 'tarjeta-log-stream--out';
+            return `<div class="tarjeta-log-linea">
+                <span class="tarjeta-log-tiempo">${hora}</span>
+                <span class="tarjeta-log-stream ${stream}">${l.stream || 'out'}</span>
+                <span class="tarjeta-log-msg">${l._msg || ''}</span>
+            </div>`;
+        }).join('');
+    }
+
+    // ---- Carga los últimos 10 logs de un contenedor y los inyecta en su tarjeta ----
+    async function cargarLogs(id) {
+        const cuerpo = document.getElementById('logs-' + id);
+        if (!cuerpo) return;
+        try {
+            const resp  = await fetch('/api/logs/query?id=' + id + '&limite=10');
+            const datos = await resp.json();
+            cuerpo.innerHTML = renderLineas(datos);
+        } catch {
+            cuerpo.innerHTML = '<span class="tarjeta-log-vacio">Error al cargar logs</span>';
+        }
+    }
+
+    // ---- Carga logs de todas las tarjetas visibles ----
+    function cargarTodos() {
+        document.querySelectorAll('.tarjeta-log[data-id]').forEach(el => {
+            cargarLogs(el.dataset.id);
+        });
+    }
+
+    // ---- Actualiza la vista completa ----
+    function actualizarLogs() {
+        seg = 0;
+        timerEl.textContent = 'ahora';
+        actualizarBadges();
+        cargarTodos();
+    }
+
+    // ---- Carga inicial ----
+    actualizarBadges();
+    cargarTodos();
+</script>
 
 {{end}}

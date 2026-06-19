@@ -22,12 +22,13 @@ type Puerto struct {
 
 // ---- Representa un contenedor Docker deserializado desde el backend ----
 type Contenedor struct {
-	ID             string   `json:"id"`
-	Nombre         string   `json:"nombre"`
-	Imagen         string   `json:"imagen"`
-	Estado         string   `json:"estado"`
-	ComposeProject string   `json:"compose_project"`
-	Puertos        []Puerto `json:"puertos"`
+	ID                string   `json:"id"`
+	Nombre            string   `json:"nombre"`
+	Imagen            string   `json:"imagen"`
+	Estado            string   `json:"estado"`
+	ComposeProject    string   `json:"compose_project"`
+	Puertos           []Puerto `json:"puertos"`
+	UltimaLogGuardado string   `json:"ultimo_log_guardado"`
 }
 
 // ---- Agrupa contenedores bajo un proyecto Compose (o sin proyecto) ----
@@ -38,6 +39,12 @@ type Grupo struct {
 
 // ---- Datos para la vista de contenedores: extiende DatosLayout ----
 type DatosContenedores struct {
-	DatosLayout        // ← hereda NombreUsuario, PaginaActual y CSS
-	Grupos      []Grupo // ← contenedores agrupados por compose_project
+	DatosLayout
+	Grupos []Grupo
+}
+
+// ---- Datos para la vista de logs: misma estructura que contenedores ----
+type DatosLogs struct {
+	DatosLayout
+	Grupos []Grupo
 }

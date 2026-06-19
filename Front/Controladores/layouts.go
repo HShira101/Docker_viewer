@@ -16,8 +16,11 @@ func (c *Controlador) MostrarInicio(w http.ResponseWriter, r *http.Request) {
 	c.plantillas.Inicio.ExecuteTemplate(w, "layout.html", datos)
 }
 
-// ---- Renderiza la vista de logs ----
+// ---- Renderiza la vista de logs con los contenedores agrupados ----
 func (c *Controlador) MostrarLogs(w http.ResponseWriter, r *http.Request) {
-	datos := DatosLayout{NombreUsuario: sesion.ObtenerUsuario(r), PaginaActual: "logs"}
+	datos := DatosLogs{
+		DatosLayout: DatosLayout{NombreUsuario: sesion.ObtenerUsuario(r), PaginaActual: "logs", CSS: "logs.css"},
+		Grupos:      agruparContenedores(obtenerContenedores()),
+	}
 	c.plantillas.Logs.ExecuteTemplate(w, "layout.html", datos)
 }

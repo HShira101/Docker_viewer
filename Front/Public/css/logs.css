@@ -1,0 +1,153 @@
+/* --------- Barra superior (igual que contenedores) --------- */
+.contenedores-barra {
+    margin-bottom: 24px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.ultima-actualizacion {
+    font-size: 12px;
+    color: var(--text-light);
+    margin-top: 4px;
+    display: block;
+}
+
+.boton-actualizar {
+    padding: 8px 18px;
+    background: var(--sidebar-bg);
+    font-size: 13px;
+    transition: opacity 0.15s;
+    white-space: nowrap;
+}
+
+.boton-actualizar:hover { opacity: 0.85; }
+
+.contenedores-grupos {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+/* --------- Grupo --------- */
+.grupo {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.grupo-cabecera {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: var(--sidebar-bg);
+    border-left: 4px solid var(--azul);
+    border-radius: 6px;
+}
+
+.grupo-nombre {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--white);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.grupo-contador {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-light);
+    background: var(--gris);
+    padding: 2px 8px;
+    border-radius: 20px;
+}
+
+.grupo-grid--logs {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+/* --------- Tarjeta de log --------- */
+.tarjeta-log {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* --------- Badge de última recolección --------- */
+.tarjeta-log-ultima {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-light);
+    background: var(--gris);
+    padding: 2px 8px;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+/* --------- Cuerpo terminal --------- */
+.tarjeta-log-cuerpo {
+    background: #0f172a;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    flex: 1;
+    min-height: 80px;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+/* --------- Línea individual de log --------- */
+.tarjeta-log-linea {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.tarjeta-log-tiempo {
+    color: #64748b;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.tarjeta-log-stream {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+.tarjeta-log-stream--out { background: #1e3a5f; color: #60a5fa; }
+.tarjeta-log-stream--err { background: #3b1515; color: #f87171; }
+
+.tarjeta-log-msg {
+    color: #e2e8f0;
+    word-break: break-all;
+}
+
+/* --------- Estados vacío / cargando --------- */
+.tarjeta-log-cargando,
+.tarjeta-log-vacio {
+    font-size: 12px;
+    color: #475569;
+    font-family: 'Courier New', monospace;
+    padding: 4px 0;
+}
+
+/* --------- Grid de logs más ancho (tarjetas más grandes que contenedores) --------- */
+.grupo-grid--logs {
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+}

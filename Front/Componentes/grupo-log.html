@@ -1,0 +1,24 @@
+{{define "grupo-log"}}
+
+<!-- ---- Componente grupo-log: agrupa tarjetas de logs bajo un proyecto Compose ---- -->
+<div class="grupo">
+
+    <!-- ---- Cabecera del grupo: nombre del proyecto y conteo ---- -->
+    <div class="grupo-cabecera">
+        <span class="grupo-nombre">{{if .Nombre}}{{.Nombre}}{{else}}Sin proyecto{{end}}</span>
+        <span class="grupo-contador">{{len .Contenedores}}</span>
+    </div>
+    <!-- ---- Fin Cabecera del grupo ---- -->
+
+    <!-- ---- Grid de tarjetas de logs ---- -->
+    <div class="grupo-grid grupo-grid--logs">
+        {{range .Contenedores}}
+            {{template "tarjeta-log" .}}
+        {{end}}
+    </div>
+    <!-- ---- Fin Grid ---- -->
+
+</div>
+<!-- ---- Fin Componente grupo-log ---- -->
+
+{{end}}

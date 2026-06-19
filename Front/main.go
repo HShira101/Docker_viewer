@@ -34,7 +34,7 @@ func main() {
 		Login:        template.Must(template.ParseFS(archivos, "Login/login.html")),
 		Inicio:       template.Must(template.ParseFS(archivos, "Layout/layout.html", "Vistas/inicio.html")),
 		Contenedores: template.Must(template.ParseFS(archivos, "Layout/layout.html", "Vistas/contenedores.html", "Componentes/tarjeta.html", "Componentes/grupo.html")),
-		Logs:         template.Must(template.ParseFS(archivos, "Layout/layout.html", "Vistas/logs.html")),
+		Logs:         template.Must(template.ParseFS(archivos, "Layout/layout.html", "Vistas/logs.html", "Componentes/tarjeta-log.html", "Componentes/grupo-log.html")),
 	}
 
 	// ---- Expone la carpeta Public como archivos estáticos en /public/ ----
@@ -60,6 +60,8 @@ func main() {
 	rute.HandleFunc("POST /api/contenedores/{id}/iniciar", proteger(controlador.APIIniciar))
 	rute.HandleFunc("POST /api/contenedores/{id}/detener", proteger(controlador.APIDetener))
 	rute.HandleFunc("GET /logs",                           proteger(controlador.MostrarLogs))
+	rute.HandleFunc("GET /api/logs/query",                 proteger(controlador.APILogsQuery))
+	rute.HandleFunc("GET /api/logs/stream/{id}",           proteger(controlador.APILogsStream))
 	rute.HandleFunc("GET /",                               proteger(controlador.MostrarInicio))
 
 	log.Println("Frontend en :10000 → http://localhost:10000")

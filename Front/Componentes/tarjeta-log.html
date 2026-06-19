@@ -1,0 +1,25 @@
+{{define "tarjeta-log"}}
+
+<!-- ---- Componente tarjeta-log: muestra estado, última recolección y últimos logs de un contenedor ---- -->
+<div class="tarjeta-log" data-id="{{.ID}}">
+
+    <!-- ---- Cabecera: indicador de estado, nombre y timestamp último log ---- -->
+    <div class="tarjeta-cabecera">
+        <span class="tarjeta-indicador {{if eq .Estado "running"}}tarjeta-indicador--activo{{else}}tarjeta-indicador--inactivo{{end}}"></span>
+        <span class="tarjeta-nombre">{{.Nombre}}</span>
+        <span class="tarjeta-log-ultima" data-ts="{{.UltimaLogGuardado}}">
+            {{if .UltimaLogGuardado}}...{{else}}Sin logs{{end}}
+        </span>
+    </div>
+    <!-- ---- Fin Cabecera ---- -->
+
+    <!-- ---- Cuerpo: últimos 10 logs, se rellena con JS ---- -->
+    <div class="tarjeta-log-cuerpo" id="logs-{{.ID}}">
+        <span class="tarjeta-log-cargando">Cargando...</span>
+    </div>
+    <!-- ---- Fin Cuerpo ---- -->
+
+</div>
+<!-- ---- Fin Componente tarjeta-log ---- -->
+
+{{end}}

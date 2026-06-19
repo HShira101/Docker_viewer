@@ -14,7 +14,7 @@ func Listar(w http.ResponseWriter, r *http.Request) {
 	Actualizar() // ← refresca los datos desde Docker antes de responder
 
 	rows, err := database.DB.Query(`
-		SELECT id, nombre, imagen, estado, ultima_consulta, compose_project, puertos
+		SELECT id, nombre, imagen, estado, ultima_consulta, compose_project, puertos, ultimo_log_guardado
 		FROM contenedores
 		ORDER BY compose_project, nombre
 	`)
@@ -28,8 +28,12 @@ func Listar(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var c Contenedor
 		var puertosJSON string
-		rows.Scan(&c.ID, &c.Nombre, &c.Imagen, &c.Estado, &c.UltimaConsulta, &c.ComposeProject, &puertosJSON)
+		var ulLog sql.NullTime
+		rows.Scan(&c.ID, &c.Nombre, &c.Imagen, &c.Estado, &c.UltimaConsulta, &c.ComposeProject, &puertosJSON, &ulLog)
 		json.Unmarshal([]byte(puertosJSON), &c.Puertos)
+		if ulLog.Valid {
+			c.UltimaLogGuardado = ulLog.Time.UTC().Format("2006-01-02T15:04:05Z")
+		}
 		lista = append(lista, c)
 	}
 
