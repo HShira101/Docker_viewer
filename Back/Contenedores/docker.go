@@ -47,10 +47,11 @@ func clienteDocker() *http.Client {
 // ---- Consulta Docker y actualiza o inserta los contenedores en SQLite ----
 func Actualizar() {
 	var raw []struct {
-		Id    string   `json:"Id"`
-		Names []string `json:"Names"`
-		Image string   `json:"Image"`
-		State string   `json:"State"`
+		Id     string            `json:"Id"`
+		Names  []string          `json:"Names"`
+		Image  string            `json:"Image"`
+		State  string            `json:"State"`
+		Labels map[string]string `json:"Labels"`
 	}
 
 	if err := dockerGet("/containers/json?all=true", &raw); err != nil {
@@ -60,18 +61,20 @@ func Actualizar() {
 
 	ahora := time.Now()
 	for _, r := range raw {
-		nombre := r.Id[:12] // ← fallback: primeros 12 caracteres del ID
+		nombre := r.Id[:12]
 		if len(r.Names) > 0 {
-			nombre = r.Names[0][1:] // ← Docker prefija el nombre con "/", se elimina
+			nombre = r.Names[0][1:]
 		}
+		composeProject := r.Labels["com.docker.compose.project"] // ← vacío si el contenedor no es de Compose
 		database.DB.Exec(`
-			INSERT INTO contenedores_running (id, nombre, imagen, estado, ultima_consulta)
-			VALUES (?, ?, ?, ?, ?)
+			INSERT INTO contenedores_running (id, nombre, imagen, estado, ultima_consulta, compose_project)
+			VALUES (?, ?, ?, ?, ?, ?)
 			ON CONFLICT(id) DO UPDATE SET
 				nombre          = excluded.nombre,
 				imagen          = excluded.imagen,
 				estado          = excluded.estado,
-				ultima_consulta = excluded.ultima_consulta
-		`, r.Id, nombre, r.Image, r.State, ahora)
+				ultima_consulta = excluded.ultima_consulta,
+				compose_project = excluded.compose_project
+		`, r.Id, nombre, r.Image, r.State, ahora, composeProject)
 	}
 }

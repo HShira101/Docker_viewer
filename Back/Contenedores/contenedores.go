@@ -14,9 +14,9 @@ func Listar(w http.ResponseWriter, r *http.Request) {
 	Actualizar() // ← refresca los datos desde Docker antes de responder
 
 	rows, err := database.DB.Query(`
-		SELECT id, nombre, imagen, estado, ultima_consulta
+		SELECT id, nombre, imagen, estado, ultima_consulta, compose_project
 		FROM contenedores_running
-		ORDER BY nombre
+		ORDER BY compose_project, nombre
 	`)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -27,7 +27,7 @@ func Listar(w http.ResponseWriter, r *http.Request) {
 	lista := make([]Contenedor, 0)
 	for rows.Next() {
 		var c Contenedor
-		rows.Scan(&c.ID, &c.Nombre, &c.Imagen, &c.Estado, &c.UltimaConsulta)
+		rows.Scan(&c.ID, &c.Nombre, &c.Imagen, &c.Estado, &c.UltimaConsulta, &c.ComposeProject)
 		lista = append(lista, c)
 	}
 
