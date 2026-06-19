@@ -19,10 +19,10 @@ import (
 	database "docker_viewer/back/Database"
 )
 
-// ultimaRecoleccion guarda la hora de la última recolección por container ID
+// enProceso evita que el ticker y el streaming recolecten el mismo contenedor simultáneamente
 var (
-	ultimaRecoleccion   = map[string]time.Time{}
-	muUltimaRecoleccion sync.Mutex
+	enProceso   = map[string]bool{}
+	muEnProceso sync.Mutex
 )
 
 // ---- IniciarTicker arranca el recolector en background, disparando cada 5 minutos ----
@@ -38,15 +38,32 @@ func IniciarTicker() {
 	}()
 }
 
-// ---- Construye el cliente HTTP para el socket Unix de Docker ----
+// ---- Recolecta logs de todos los contenedores de forma inmediata ----
+func RecolectarAhora() {
+	go recolectarTodos()
+}
+
+// ---- Construye el cliente HTTP para el socket Unix de Docker (con timeout) ----
 func clienteDocker() *http.Client {
 	return &http.Client{
-		Transport: &http.Transport{
-			DialContext: func(ctx context.Context, _, _ string) (net.Conn, error) {
-				return (&net.Dialer{}).DialContext(ctx, "unix", "/var/run/docker.sock")
-			},
+		Transport: transporteDocker(),
+		Timeout:   30 * time.Second,
+	}
+}
+
+// ---- Construye el cliente HTTP para streaming (sin timeout, conexión larga) ----
+func clienteDockerStream() *http.Client {
+	return &http.Client{
+		Transport: transporteDocker(),
+	}
+}
+
+// ---- Transport compartido para el socket Unix de Docker ----
+func transporteDocker() *http.Transport {
+	return &http.Transport{
+		DialContext: func(ctx context.Context, _, _ string) (net.Conn, error) {
+			return (&net.Dialer{}).DialContext(ctx, "unix", "/var/run/docker.sock")
 		},
-		Timeout: 30 * time.Second,
 	}
 }
 
@@ -58,7 +75,7 @@ func urlVlogs() string {
 	return "http://victorialogs:9428"
 }
 
-// ---- Consulta SQLite y recolecta logs de todos los contenedores (running y detenidos) ----
+// ---- Consulta SQLite y recolecta logs de todos los contenedores ----
 func recolectarTodos() {
 	rows, err := database.DB.Query(`SELECT id, nombre FROM contenedores`)
 	if err != nil {
@@ -74,15 +91,44 @@ func recolectarTodos() {
 	}
 }
 
+// ---- leerDesde lee ultimo_log_guardado de SQLite; si es NULL devuelve hace 1 hora ----
+func leerDesde(id string) time.Time {
+	var t time.Time
+	err := database.DB.QueryRow(
+		`SELECT ultimo_log_guardado FROM contenedores WHERE id = ?`, id,
+	).Scan(&t)
+	if err != nil || t.IsZero() {
+		return time.Now().Add(-1 * time.Hour)
+	}
+	return t
+}
+
+// ---- guardarDesde persiste ultimo_log_guardado en SQLite ----
+func guardarDesde(id string, t time.Time) {
+	database.DB.Exec(
+		`UPDATE contenedores SET ultimo_log_guardado = ? WHERE id = ?`, t, id,
+	)
+}
+
 // ---- Recolectar obtiene logs de un contenedor desde Docker y los envía a VictoriaLogs ----
 func Recolectar(id, nombre string) {
-	muUltimaRecoleccion.Lock()
-	desde, existe := ultimaRecoleccion[id]
-	if !existe {
-		desde = time.Now().Add(-1 * time.Hour) // primera vez: última hora
+	// Si ya hay una recolección en curso para este contenedor, salir para evitar duplicados
+	muEnProceso.Lock()
+	if enProceso[id] {
+		muEnProceso.Unlock()
+		return
 	}
+	enProceso[id] = true
+	muEnProceso.Unlock()
+
+	desde := leerDesde(id)
 	ahora := time.Now()
-	muUltimaRecoleccion.Unlock()
+
+	defer func() {
+		muEnProceso.Lock()
+		enProceso[id] = false
+		muEnProceso.Unlock()
+	}()
 
 	ruta := fmt.Sprintf(
 		"/containers/%s/logs?stdout=true&stderr=true&timestamps=true&since=%d",
@@ -97,10 +143,7 @@ func Recolectar(id, nombre string) {
 	defer resp.Body.Close()
 
 	lineas := parsearLogs(resp.Body, id, nombre)
-
-	muUltimaRecoleccion.Lock()
-	ultimaRecoleccion[id] = ahora
-	muUltimaRecoleccion.Unlock()
+	guardarDesde(id, ahora)
 
 	if len(lineas) == 0 {
 		return
@@ -112,6 +155,118 @@ func Recolectar(id, nombre string) {
 	}
 
 	log.Printf("Logs [%s]: %d líneas enviadas", nombre, len(lineas))
+}
+
+// ---- StreamLogs abre un stream SSE hacia el cliente con los logs en tiempo real ----
+// Mientras el stream está activo, el ticker y RecolectarAhora omiten este contenedor
+// porque el stream ya está pusheando a VictoriaLogs.
+// Se detiene cuando el cliente cierra la conexión (ctx cancelado).
+func StreamLogs(ctx context.Context, id, nombre string, w http.ResponseWriter) {
+	// Marca el contenedor como en proceso para que el ticker y on-demand lo omitan
+	muEnProceso.Lock()
+	if enProceso[id] {
+		muEnProceso.Unlock()
+		http.Error(w, "ya hay una recolección en curso", http.StatusConflict)
+		return
+	}
+	enProceso[id] = true
+	muEnProceso.Unlock()
+
+	defer func() {
+		guardarDesde(id, time.Now()) // el ticker arranca desde aquí, no duplica lo que el stream ya envió
+		muEnProceso.Lock()
+		enProceso[id] = false
+		muEnProceso.Unlock()
+	}()
+
+	flusher, ok := w.(http.Flusher)
+	if !ok {
+		http.Error(w, "streaming no soportado", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/event-stream")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("Connection", "keep-alive")
+
+	ruta := fmt.Sprintf(
+		"/containers/%s/logs?stdout=true&stderr=true&timestamps=true&follow=true",
+		id,
+	)
+
+	// Usa el contexto del request: cuando el browser cierra la conexión, cancela el stream de Docker
+	req, err := http.NewRequestWithContext(ctx, "GET", "http://localhost"+ruta, nil)
+	if err != nil {
+		return
+	}
+
+	resp, err := clienteDockerStream().Do(req)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+
+	for {
+		header := make([]byte, 8)
+		if _, err := io.ReadFull(resp.Body, header); err != nil {
+			break
+		}
+
+		streamTipo := header[0]
+		frameSize := binary.BigEndian.Uint32(header[4:8])
+
+		frame := make([]byte, frameSize)
+		if _, err := io.ReadFull(resp.Body, frame); err != nil {
+			break
+		}
+
+		stream := "stdout"
+		if streamTipo == 2 {
+			stream = "stderr"
+		}
+
+		var loteFrame []LineaLog
+
+		scanner := bufio.NewScanner(bytes.NewReader(frame))
+		for scanner.Scan() {
+			linea := scanner.Text()
+			if linea == "" {
+				continue
+			}
+
+			tiempo := time.Now().UTC().Format(time.RFC3339Nano)
+			mensaje := linea
+
+			if idx := strings.Index(linea, " "); idx > 0 {
+				candidato := linea[:idx]
+				if strings.Contains(candidato, "T") && strings.Contains(candidato, "Z") {
+					tiempo = candidato
+					mensaje = linea[idx+1:]
+				}
+			}
+
+			ll := LineaLog{
+				Tiempo:  tiempo,
+				Mensaje: mensaje,
+				ID:      id,
+				Nombre:  nombre,
+				Stream:  stream,
+			}
+
+			// Envía la línea al browser como evento SSE
+			data, _ := json.Marshal(ll)
+			fmt.Fprintf(w, "data: %s\n\n", data)
+			flusher.Flush()
+
+			loteFrame = append(loteFrame, ll)
+		}
+
+		// Pushea el frame completo a VictoriaLogs en background sin bloquear el stream
+		if len(loteFrame) > 0 {
+			lote := loteFrame
+			go enviarAVictoriaLogs(lote)
+		}
+	}
 }
 
 // ---- Envía un slice de líneas a VictoriaLogs en formato JSONL ----
@@ -163,7 +318,6 @@ func parsearLogs(r io.Reader, id, nombre string) []LineaLog {
 				continue
 			}
 
-			// Docker con timestamps: "2024-01-01T00:00:00.000000000Z mensaje"
 			tiempo := time.Now().UTC().Format(time.RFC3339Nano)
 			mensaje := linea
 

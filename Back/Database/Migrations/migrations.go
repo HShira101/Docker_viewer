@@ -42,4 +42,7 @@ var lista = []string{
 
 	// 004 — renombra tabla a nombre genérico sin sufijo _running
 	`ALTER TABLE contenedores_running RENAME TO contenedores`,
+
+	// 005 — guarda el timestamp del último log enviado a VictoriaLogs
+	`ALTER TABLE contenedores ADD COLUMN ultimo_log_guardado DATETIME`,
 }
