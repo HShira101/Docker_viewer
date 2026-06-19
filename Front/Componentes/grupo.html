@@ -1,0 +1,24 @@
+{{define "grupo"}}
+
+<!-- ---- Componente grupo: agrupa tarjetas de contenedores bajo un proyecto Compose ---- -->
+<div class="grupo">
+
+    <!-- ---- Cabecera del grupo: nombre del proyecto y conteo de contenedores ---- -->
+    <div class="grupo-cabecera">
+        <span class="grupo-nombre">{{if .Nombre}}{{.Nombre}}{{else}}Sin proyecto{{end}}</span>
+        <span class="grupo-contador">{{len .Contenedores}}</span>
+    </div>
+    <!-- ---- Fin Cabecera del grupo ---- -->
+
+    <!-- ---- Grid de tarjetas del grupo ---- -->
+    <div class="grupo-grid">
+        {{range .Contenedores}}
+            {{template "tarjeta" .}}
+        {{end}}
+    </div>
+    <!-- ---- Fin Grid de tarjetas del grupo ---- -->
+
+</div>
+<!-- ---- Fin Componente grupo ---- -->
+
+{{end}}
