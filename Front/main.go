@@ -61,6 +61,7 @@ func main() {
 	rute.HandleFunc("POST /api/contenedores/{id}/detener", proteger(controlador.APIDetener))
 	rute.HandleFunc("GET /logs",                           proteger(controlador.MostrarLogs))
 	rute.HandleFunc("GET /api/logs/query",                 proteger(controlador.APILogsQuery))
+	rute.HandleFunc("GET /api/logs/recolectar",            proteger(controlador.APILogsRecolectar))
 	rute.HandleFunc("GET /api/logs/stream/{id}",           proteger(controlador.APILogsStream))
 	rute.HandleFunc("GET /",                               proteger(controlador.MostrarInicio))
 

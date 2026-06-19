@@ -38,6 +38,7 @@ func main() {
 	mux.HandleFunc("POST /api/contenedores/{id}/iniciar", contenedores.Iniciar)
 	mux.HandleFunc("POST /api/contenedores/{id}/detener", contenedores.Detener)
 	mux.HandleFunc("GET /api/logs/query",                 logs.Query)
+	mux.HandleFunc("GET /api/logs/recolectar",            logs.RecolectarHandler)
 	mux.HandleFunc("GET /api/logs/stream/{id}",           logs.Stream)
 
 	log.Println("Backend en :10001 → http://localhost:10001")

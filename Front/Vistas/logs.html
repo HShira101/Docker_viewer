@@ -81,15 +81,28 @@
         });
     }
 
-    // ---- Actualiza la vista completa ----
-    function actualizarLogs() {
+    // ---- Recolecta todos los contenedores en el back y luego recarga los logs ----
+    async function actualizarLogs() {
+        const btn = document.querySelector('.boton-actualizar');
+        btn.disabled = true;
+        btn.textContent = 'Recolectando...';
+
+        try {
+            await fetch('/api/logs/recolectar'); // espera a que el back termine la recolección
+        } catch (e) {
+            console.error('Error recolectando:', e);
+        }
+
         seg = 0;
         timerEl.textContent = 'ahora';
         actualizarBadges();
         cargarTodos();
+
+        btn.disabled = false;
+        btn.textContent = 'Actualizar';
     }
 
-    // ---- Carga inicial ----
+    // ---- Carga inicial (solo query, sin recolectar) ----
     actualizarBadges();
     cargarTodos();
 </script>

@@ -30,6 +30,28 @@ func (c *Controlador) APILogsQuery(w http.ResponseWriter, r *http.Request) {
 	io.Copy(w, resp.Body)
 }
 
+// ---- Proxy GET /api/logs/recolectar?id=X → back (síncrono, espera a que termine) ----
+func (c *Controlador) APILogsRecolectar(w http.ResponseWriter, r *http.Request) {
+	backURL := os.Getenv("BACK_URL")
+	if backURL == "" {
+		backURL = "http://back:10001"
+	}
+
+	id := r.URL.Query().Get("id")
+	url := backURL + "/api/logs/recolectar"
+	if id != "" {
+		url += "?id=" + id
+	}
+
+	resp, err := http.Get(url)
+	if err != nil {
+		http.Error(w, "Backend no disponible", http.StatusServiceUnavailable)
+		return
+	}
+	resp.Body.Close()
+	w.WriteHeader(resp.StatusCode)
+}
+
 // ---- Proxy GET /api/logs/stream/{id} → back (SSE) ----
 func (c *Controlador) APILogsStream(w http.ResponseWriter, r *http.Request) {
 	backURL := os.Getenv("BACK_URL")

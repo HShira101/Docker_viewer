@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 
@@ -34,9 +35,6 @@ func Query(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Recolecta logs frescos antes de consultar
-	Recolectar(id, nombre)
-
 	// Consulta VictoriaLogs con LogsQL
 	lineas, err := consultarVictoriaLogs(id, limite)
 	if err != nil {
@@ -46,6 +44,29 @@ func Query(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(lineas)
+}
+
+// ---- Handler GET /api/logs/recolectar?id=X ----
+// Recolecta logs de un contenedor (o todos si no se pasa id) y espera a que termine
+func RecolectarHandler(w http.ResponseWriter, r *http.Request) {
+	id := r.URL.Query().Get("id")
+
+	if id == "" {
+		// Sin id → recolecta todos de forma síncrona
+		recolectarTodos()
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
+	var nombre string
+	err := database.DB.QueryRow(`SELECT nombre FROM contenedores WHERE id = ?`, id).Scan(&nombre)
+	if err != nil {
+		http.Error(w, "contenedor no encontrado", http.StatusNotFound)
+		return
+	}
+
+	Recolectar(id, nombre)
+	w.WriteHeader(http.StatusOK)
 }
 
 // ---- Handler GET /api/logs/stream/{id} ----
@@ -70,9 +91,10 @@ func Stream(w http.ResponseWriter, r *http.Request) {
 // ---- Consulta VictoriaLogs y devuelve las últimas N líneas del contenedor ----
 func consultarVictoriaLogs(id string, limite int) ([]LineaLog, error) {
 	query := `{container_id="` + id + `"}`
-	url := urlVlogs() + "/select/logsql/query?query=" + query + "&limit=" + strconv.Itoa(limite)
+	endpoint := urlVlogs() + "/select/logsql/query?query=" + url.QueryEscape(query) +
+		"&limit=" + strconv.Itoa(limite)
 
-	resp, err := http.Get(url)
+	resp, err := http.Get(endpoint)
 	if err != nil {
 		return nil, err
 	}

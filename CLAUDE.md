@@ -152,11 +152,21 @@ Cuando te pida documentación pdf debes darme un pdf con lo siguiente:
           |-> Frontend agrupa contenedores por proyecto Compose.
           |-> Tarjetas muestran: estado, imagen, puertos publicados (IPv4/IPv6 con link al servicio).
 
-- Fase 3: Vista de logs funcional.
-  |-> 1: Logs por contenedor desde Docker API (GET /containers/{id}/logs).
-  |-> 2: Vista de logs en el frontend con filtro por contenedor.
-  |-> 3: Integración con Vector + Victoria Logs para logs persistentes.
-  |-> 4: Botón "Logs" en tarjeta de contenedor abre la vista filtrada.
+- Fase 3: [EN PROGRESO] Vista de logs funcional.
+  |-> 1: [COMPLETADO] Colector de logs desde Docker API con ticker cada 5min + recolección bajo demanda.
+          |-> Paquete Back/Logs/ con colector.go (ticker, Recolectar, StreamLogs) y handler.go.
+          |-> enProceso mutex evita duplicados entre ticker y stream.
+          |-> ultimo_log_guardado persiste en SQLite (migración 005).
+          |-> Push a VictoriaLogs vía /insert/jsonline (JSONL).
+  |-> 2: [COMPLETADO] Vista de logs en el frontend.
+          |-> Componentes: tarjeta-log.html, grupo-log.html.
+          |-> Vista logs.html agrupa contenedores por compose_project igual que contenedores.
+          |-> JS carga últimos 10 logs por tarjeta desde VictoriaLogs al abrir.
+          |-> Botón Actualizar: recolecta primero (síncrono), luego re-consulta VictoriaLogs.
+  |-> 3: [COMPLETADO] Integración con Victoria Logs directamente (sin Vector).
+          |-> Servicio victorialogs en docker-compose.yml, retención 7 días.
+          |-> Query con LogsQL {container_id="X"} con URL encoding correcto.
+  |-> 4: [PENDIENTE] Botón "Logs" en tarjeta de contenedor abre la vista filtrada por contenedor.
 
 - Fase 4: Vista de Usuarios funcional.
 - Fase 5: Vista de comandos.
